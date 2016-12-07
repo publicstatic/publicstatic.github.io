@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <style> 
+    .animated {
+        transition: left 1s, top 1s;
+    }
+  </style>
+  <script src="/binpack.js"></script>
+  <script>
+    var width = 300, height = 300;
+    var instance = new Module.GuillotineBinPack(width, height);
+    var num = 0;
+
+    function inPixels(v) 
+    { 
+        return v.toString() + "px"; 
+    }
+    
+    function createBinpack() {        
+        var binpack = document.createElement('div');
+        binpack.id     = "binpack";
+        var style = binpack.style;
+        style.width  = inPixels(width);
+        style.height = inPixels(height);
+        style.top = 0;
+        style.left = 0;
+        style.zIndex   = 8;
+        style.position = "absolute";
+        style.border   = "1px solid";
+        document.body.appendChild(binpack);
+        var placedBox = instance.insert(1, 1);
+    }
+
+    function getRandomSize() {
+        var minBoxSize = 20;
+        var maxBoxSize = 100;
+        return minBoxSize + Math.round(Math.random() * (maxBoxSize - minBoxSize));
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function generateNewElement() {
+        var box = document.createElement('div');
+        var boxWidth = getRandomSize();
+        var boxHeight = getRandomSize();
+        box.id = num.toString(); num++;
+        box.className = "animated";
+        var style = box.style;
+        style.width = inPixels(boxWidth);
+        style.height = inPixels(boxHeight);        
+        style.top = inPixels(height + 100);
+        style.backgroundColor = getRandomColor();
+        style.position = "absolute";        
+        style.left = inPixels(width / 2 - boxWidth / 2);
+        style.top = inPixels(height + 100);    
+        box.onclick = function packBox() {
+            var placedBox = instance.insert(boxWidth, boxHeight);            
+            console.log(placedBox);
+            if (placedBox.every(function (e) {return e == 0;})) {
+                console.log("oops");
+                placedBox = [2000, 2000];
+            }
+            style.left = inPixels(placedBox[0]);
+            style.top = inPixels(placedBox[1]);
+            generateNewElement();
+        };
+
+        document.body.appendChild(box);
+    }
+  </script>
+  <body onload="createBinpack();generateNewElement()">
+  </body>
+</html>
